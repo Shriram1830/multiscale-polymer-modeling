@@ -72,7 +72,7 @@ Output filenames follow `{phase}_seed{n}_{test}_{axis}.{ext}`, where `phase` is 
     md_crystalline/triclinic.in       # orthogonal -> triclinic box conversion
     md_crystalline/shear.in           # shear deformation, xy/xz/yz
     md_amorphous/equilibration.in     # minimization + NVT/NPT equilibration
-    md_amorphous/tensile.in           # uniaxial tensile deformation, x/y/z
+
 
 ## Limitations and Assumptions
 
