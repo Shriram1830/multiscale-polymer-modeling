@@ -1,0 +1,59 @@
+! ====================================================================
+! Quantum ESPRESSO Input: SCF Calculation (Cutoff & K-Point Testing)
+! Description: Template for structural and electronic convergence testing.
+! The _ECUTWFC_, _ECUTRHO_, and _KPOINTS_ placeholders are designed to 
+! be replaced dynamically via a Bash or Python automation script.
+! ====================================================================
+
+&CONTROL
+    calculation   = 'scf'
+    restart_mode  = 'from_scratch'
+    prefix        = 'polymer_crystal'
+    outdir        = '../tmp/'
+    pseudo_dir    = '../pseudo/'
+    tprnfor       = .true.
+    tstress       = .true.
+/
+
+&SYSTEM
+    ibrav       = 0
+    nat         = 46  ! INPUT: Update to match your specific unit cell
+    ntyp        = 3
+    ecutwfc     = _ECUTWFC_
+    ecutrho     = _ECUTRHO_
+    occupations = 'smearing'
+    smearing    = 'gaussian'
+    degauss     = 0.005
+/
+
+&ELECTRONS
+    conv_thr         = 1.0d-6
+    mixing_beta      = 0.1
+    mixing_mode      = 'local-TF'
+    mixing_ndim      = 16
+    diagonalization  = 'cg'
+    electron_maxstep = 500
+    diago_thr_init   = 5.0d-2
+/
+
+ATOMIC_SPECIES
+   C   12.011   C.pbe-n-kjpaw_psl.1.0.0.UPF
+   H    1.008   H.pbe-kjpaw_psl.1.0.0.UPF
+   O   15.999   O.pbe-n-kjpaw_psl.1.0.0.UPF
+
+CELL_PARAMETERS angstrom
+! INPUT: Insert your optimized cell parameters here
+   7.620000   0.000000   0.000000
+   0.000000   5.870000   0.000000
+   0.000000   0.000000  10.030000
+
+ATOMIC_POSITIONS crystal
+! INPUT: Insert your parameterized fractional coordinates here
+C      0.006346  0.378270  0.495890
+C      0.321245  0.004791  0.102332
+C      0.433356  0.889102  0.015062
+O      0.154864  0.351901  0.151184
+! ... (Additional atoms truncated for template) ...
+
+K_POINTS automatic
+_KPOINTS_

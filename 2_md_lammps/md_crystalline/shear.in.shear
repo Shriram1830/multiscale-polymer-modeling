@@ -1,0 +1,120 @@
+# ====================================================================
+# LAMMPS Input Script: Shear Deformation
+# Description: Applies constant true strain rate shear deformation to an 
+# equilibrated triclinic polymer system using an NPT ensemble.
+# ====================================================================
+
+#------- input_variables --------
+echo        screen
+variable    strain equal 0.1          # 10% Strain
+variable    strvar equal v_strain*100
+variable    strain_rate_s equal 1e8   # 1e8 1/s
+variable    mytimestep equal 0.1      # 0.1 fs
+
+# Shear direction (xy = 1, xz = 2, yz = 3)
+variable    dir equal 1   # CHANGE THIS FOR EACH RUN
+variable    rep equal 1   # CHANGE THIS TO MATCH YOUR SEED
+
+if "${dir} == 1" then &
+  "variable myid string polymer_seed${rep}_shear_XY"
+
+if "${dir} == 2" then &
+  "variable myid string polymer_seed${rep}_shear_XZ"
+
+if "${dir} == 3" then &
+  "variable myid string polymer_seed${rep}_shear_YZ"
+
+#-------- initialization --------
+units       real
+dimension   3
+boundary    p p p
+atom_style  full
+newton      on
+
+#-------- force_field ------------
+bond_style      class2
+angle_style     class2
+dihedral_style  class2
+improper_style  class2
+special_bonds   lj/coul 0 0 1
+pair_style      lj/class2/coul/long 10.0
+pair_modify     mix sixthpower
+
+# Automatically reads the correct triclinic file based on your seed number
+read_data       equilibrated_polymer_triclinic_${rep}.data # INPUT: Insert your parameterized LAMMPS triclinic data file here
+kspace_style    pppm 1.0e-4             
+
+neigh_modify    every 1 delay 0 check yes one 5000 page 50000
+
+#----------- settings ------------
+timestep        ${mytimestep}
+
+variable        strain_rate_fs equal ${strain_rate_s}*1e-15 # in 1/fs
+variable        totaltime equal ${strain}/${strain_rate_fs} # total time in femtoseconds
+variable        steps equal ${totaltime}/dt
+
+variable        eeng equal time*${strain_rate_fs}
+variable        etrue equal ln(1+v_eeng)
+
+# strains
+variable        tmp equal ly
+variable        ly0 equal ${tmp}
+variable        tmp equal lz
+variable        lz0 equal ${tmp}
+
+variable        eengxy equal xy/${ly0}
+variable        etruexy equal ln(1+v_eengxy)
+
+variable        eengxz equal xz/${lz0}
+variable        etruexz equal ln(1+v_eengxz)
+
+variable        eengyz equal yz/${lz0}
+variable        etrueyz equal ln(1+v_eengyz)
+
+#----- calculate_stresses -------
+compute         shear_temp all temp/deform       # <--- CORRECTED: Removes streaming velocity from temp calculation
+compute         p all pressure shear_temp        # <--- CORRECTED: Uses the accurate deformation temperature
+
+variable        sxx equal -0.101325*c_p[1] #in MPa
+variable        syy equal -0.101325*c_p[2] #in MPa
+variable        szz equal -0.101325*c_p[3] #in MPa
+variable        sxy equal -0.101325*c_p[4] #in MPa
+variable        sxz equal -0.101325*c_p[5] #in MPa
+variable        syz equal -0.101325*c_p[6] #in MPa
+variable        svm equal sqrt(0.5*((v_sxx-v_syy)^2+(v_syy-v_szz)^2+(v_szz-v_sxx)^2+6*(v_sxy^2+v_sxz^2+v_syz^2)))
+
+#----------- outputs ----------
+fix             sxx_ave all ave/time 1 2500 2500 v_sxx
+fix             syy_ave all ave/time 1 2500 2500 v_syy
+fix             szz_ave all ave/time 1 2500 2500 v_szz
+fix             sxy_ave all ave/time 1 2500 2500 v_sxy 
+fix             sxz_ave all ave/time 1 2500 2500 v_sxz
+fix             syz_ave all ave/time 1 2500 2500 v_syz
+fix             svm_ave all ave/time 1 2500 2500 v_svm
+
+thermo           2500 
+log              ${myid}.log
+dump             1 all custom 100000 ${myid}.dump x y z type id 
+
+thermo_style    custom step temp press pxx pyy pzz etotal ke pe density vol v_eengxy v_eengxz v_eengyz v_etruexy v_etruexz v_etrueyz v_sxx v_syy v_szz v_sxy v_sxz v_syz v_svm f_sxx_ave f_syy_ave f_szz_ave f_sxy_ave f_sxz_ave f_syz_ave f_svm_ave
+
+#----------- run -------------
+if "${dir} == 1" then &
+   "fix          1 all npt temp 300 300 100 y 1 1 1000 z 1 1 1000" &
+   "fix          2 all deform 1 xy erate ${strain_rate_fs} remap v"
+if "${dir} == 2" then &
+   "fix          1 all npt temp 300 300 100 x 1 1 1000 z 1 1 1000" &
+   "fix          2 all deform 1 xz erate ${strain_rate_fs} remap v"
+if "${dir} == 3" then &
+   "fix          1 all npt temp 300 300 100 x 1 1 1000 y 1 1 1000" &
+   "fix          2 all deform 1 yz erate ${strain_rate_fs} remap v"
+
+fix_modify      1 temp shear_temp  # <--- NEW: Tells the NPT thermostat to use the corrected deformation temperature
+
+run             ${steps}
+
+#-------- wrap up ------------
+write_restart   ${myid}.restart
+write_data      ${myid}.data
+
+#---------- end --------------

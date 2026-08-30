@@ -1,0 +1,63 @@
+# ====================================================================
+# LAMMPS Input Script: Triclinic Box Conversion & Equilibration
+# Description: Converts an orthogonal simulation box to a triclinic 
+# representation (required for shear deformation), minimizes the 
+# structure, and equilibrates using an NPT ensemble.
+# ====================================================================
+
+#---------initialization---------
+
+echo            screen
+units           real
+dimension       3
+boundary        p p p
+atom_style      full    # PCFF requires explicit bonds
+newton          on
+
+# ---> JUST CHANGE THIS NUMBER FOR EACH RUN (1, 2, 3, 4, 5) <---
+variable        rep equal 1
+variable        myid string r${rep}_trc
+
+#--------force-field------------
+bond_style      class2 
+angle_style     class2
+dihedral_style  class2
+improper_style  class2
+special_bonds   lj/coul 0 0 1
+kspace_style    pppm 1.0e-4
+pair_style      lj/class2/coul/long 10.0 
+pair_modify     mix sixthpower
+
+# Read the equilibrated orthogonal data file
+read_data       equilibrated_polymer_${rep}.data # INPUT: Insert your parameterized LAMMPS data file here
+
+#-----------settings------------
+
+timestep        0.25
+variable        totaltime equal 500000    # 0.5 ns    
+variable        totalsteps equal ${totaltime}/dt  
+variable        Time equal step*dt/1000   # time in picoseconds 
+
+compute         kpa all ke/atom
+compute         ppa all pe/atom
+
+change_box      all triclinic remap    # change box over to triclinic
+kspace_style    pppm 1.0e-4            # <--- REBUILD THE GRID AFTER BOX CHANGE
+
+thermo           5000 # every picosecond
+
+log              ${myid}.log
+dump             1 all custom 100000 ${myid}.dump x y z type id c_ppa c_kpa
+
+thermo_style    custom step v_Time temp press pxx pyy pzz etotal ke pe density vol
+
+#--------minimize--------------
+fix             cg all box/relax x 0 y 0 z 0
+minimize        1.0e-8 1.0e-8 100000 100000
+unfix           cg
+
+fix             1 all npt temp 300 300 100 aniso 1 1 1000  
+
+run             ${totalsteps}
+write_data      ${myid}.data
+write_restart   ${myid}.restart
