@@ -1,5 +1,5 @@
 """
-parse_and_plot_mechanical_properties.py
+amorphous_properties.py
 
 Parses LAMMPS log files from uniaxial tensile deformation simulations.
 Extracts axial stress/strain and lateral strains to simultaneously calculate 
