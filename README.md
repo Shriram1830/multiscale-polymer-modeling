@@ -60,7 +60,7 @@ Structural relaxation and convergence testing on the crystalline PEK unit cell. 
 
 The relaxed geometry is evaluated against the literature crystal structure, not carried forward automatically — the classical MD model in Stage 2 is built independently from the literature lattice parameters and programmatically generated coordinates, using the tools listed below.
 
-See `_dft_quantum_espresso/DFT_README.md` for the full methodology
+See `1_dft_quantum_espresso/DFT_README.md` for the full methodology
 
 ## Stage 2 — Molecular Dynamics (LAMMPS)
 
