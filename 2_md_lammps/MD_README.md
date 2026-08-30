@@ -57,7 +57,7 @@ Output filenames follow `{phase}_seed{n}_{test}_{axis}.{ext}`, where `phase` is 
     crystalline_seed1_tension_X.log       <- tensile.in (md_crystalline)
     crystalline_seed1_shear_XY.log        <- shear.in
     amorphous_seed1_equilibrated.data     <- equilibration.in (md_amorphous)
-    amorphous_seed1_tension_X.log         <- tensile.in (md_amorphous)
+   
 
 ## Tools Used
 
