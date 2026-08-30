@@ -15,15 +15,16 @@ variable    mytimestep equal 0.1
 # Strain direction (x = 1, y = 2, z = 3)
 variable    dir equal 1 # CHANGE
 variable    rep equal 1 # CHANGE
+variable    phase string crystalline
 
 if "${dir} == 1" then &
-  "variable myid string polymer_seed${rep}_tension_X"
+  "variable myid string ${phase}_seed${rep}_tension_X"
 
 if "${dir} == 2" then &
-  "variable     myid string polymer_seed${rep}_tension_Y"
+  "variable     myid string ${phase}_seed${rep}_tension_Y"
 
 if "${dir} == 3" then &
-  "variable     myid string polymer_seed${rep}_tension_Z"
+  "variable     myid string ${phase}_seed${rep}_tension_Z"
 
 #-------- initialization --------
 
@@ -53,7 +54,7 @@ kspace_style    pppm 1.0e-4
 pair_style      lj/class2/coul/long 10.0 # IFF
 pair_modify     mix sixthpower
 
-read_data       equilibrated_polymer_${rep}.data # INPUT: Insert your parameterized LAMMPS data file here
+read_data       ${phase}_seed${rep}_equilibrated.data # INPUT: Insert your parameterized LAMMPS data file here
 
 neighbor        3.0 bin
 neigh_modify    every 1 delay 0 check yes
