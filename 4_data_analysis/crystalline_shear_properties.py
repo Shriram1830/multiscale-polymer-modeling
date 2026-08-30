@@ -1,5 +1,5 @@
 """
-parse_and_plot_shear_modulus.py
+crystalline_shear_properties.py
 
 Parses LAMMPS log files from shear deformation simulations.
 Extracts shear stress and strain, calculates the Shear Modulus (G) 
