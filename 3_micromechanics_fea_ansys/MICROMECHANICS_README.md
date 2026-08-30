@@ -42,7 +42,6 @@ Each target crystallinity in the chosen set requires its own amorphous block len
 
 Each plank is built and solved as its own two-body RVE in ANSYS Material Designer with periodic boundary conditions, GCB material from Level 1 assigned to one block and amorphous PEK to the other, giving one effective lamella stiffness tensor per target crystallinity.
 
-> **Note:** ANSYS's embedded geometry kernel enforces a minimum modeling scale in the micrometer range, so in practice all geometry is built at a proportionally scaled-up size (nanometers → millimeters, a 10⁶× scale factor) rather than at the true physical scale. Linear elastic homogenization is scale-invariant - the effective stiffness tensor depends only on volume fraction and shape ratio, not absolute dimensions - so this has no effect on the resulting properties. This is a common and defensible workaround for CAD-kernel precision limits in RVE-based micromechanics, not a physical approximation.
 
 ### Level 3 - Spherulite
 
