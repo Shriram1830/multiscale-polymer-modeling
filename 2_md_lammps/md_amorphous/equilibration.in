@@ -11,6 +11,7 @@
 units           real
 atom_style      full
 boundary        p p p
+variable        rep equal 1
 
 pair_style      lj/class2/coul/long 10.0
 kspace_style    pppm 1.0e-4
@@ -65,5 +66,5 @@ unfix           2
 # ==============================================================================
 # 7. SAVE FINAL STRUCTURE
 # ==============================================================================
-write_data      final_equilibrated_polymer_1.data
+write_data      amorphous_seed${rep}_equilibrated.data
 print           "EQUILIBRATION COMPLETE!"
