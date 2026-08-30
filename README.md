@@ -6,7 +6,7 @@ All code in this repository is a **vanilla template**: input files use placehold
 
 ## Motivation
 
-Polyetherketone is a semicrystalline thermoplastic from the polyaryletherketone (PAEK) family, used in place of metals in high-temperature aerospace structural components. Like other PAEK resins, its crystalline and amorphous regions coexist across a hierarchy of length scales — from the unit cell up through granular crystal blocks, lamella stacks, and spherulites — and the degree of crystallinity is a process-dependent variable rather than a fixed material constant.
+Polyetherketone is a semicrystalline thermoplastic from the polyaryletherketone (PAEK) family, used in place of metals in high-temperature aerospace structural components. Like other PAEK resins, its crystalline and amorphous regions coexist across a hierarchy of length scales - from the unit cell up through granular crystal blocks, lamella stacks, and spherulites - and the degree of crystallinity is a process-dependent variable rather than a fixed material constant.
 
 No single simulation method spans this entire range: molecular dynamics (MD) can predict single-phase elastic constants at the nanometer scale, but the spherulitic microstructure that governs bulk behavior exists at the micron scale. A multiscale framework is needed to connect the two.
 
@@ -16,13 +16,13 @@ This repository implements that framework: density functional theory (DFT) relax
 
 The pipeline has three modeling stages, run in order of increasing length scale, followed by a shared data-analysis layer:
 
-1. **DFT (Quantum ESPRESSO)** — relaxes the crystalline PEK unit cell starting from literature lattice parameters and programmatically generated fractional coordinates, and evaluates the resulting geometry against the experimentally reported crystal structure.
+1. **DFT (Quantum ESPRESSO)** - relaxes the crystalline PEK unit cell starting from literature lattice parameters and programmatically generated fractional coordinates, and evaluates the resulting geometry against the experimentally reported crystal structure.
 
-2. **Molecular Dynamics (LAMMPS)** — predicts elastic constants for the crystalline and amorphous phases independently, each modeled as its own MD system with its own equilibration, tensile, and (for the crystalline phase) shear deformation protocol.
+2. **Molecular Dynamics (LAMMPS)** - predicts elastic constants for the crystalline and amorphous phases independently, each modeled as its own MD system with its own equilibration, tensile, and (for the crystalline phase) shear deformation protocol.
 
-3. **Micromechanics (ANSYS Material Designer)** — homogenizes the two phase-level stiffness tensors up through three explicit length scales (Granular Crystal Block → Lamella → Spherulite) to predict bulk semicrystalline properties as a function of crystallinity.
+3. **Micromechanics (ANSYS Material Designer)** - homogenizes the two phase-level stiffness tensors up through three explicit length scales (Granular Crystal Block -> Lamella -> Spherulite) to predict bulk semicrystalline properties as a function of crystallinity.
 
-4. **Data Analysis (Python)** — parses LAMMPS log output from stage 2 into density, modulus, and Poisson's ratio values and generates the plots and summary tables consumed by stage 3.
+4. **Data Analysis (Python)** - parses LAMMPS log output from stage 2 into density, modulus, and Poisson's ratio values and generates the plots and summary tables consumed by stage 3.
 
 ## Repository Structure
 
@@ -41,7 +41,6 @@ The pipeline has three modeling stages, run in order of increasing length scale,
     │   │
     │   └── md_amorphous/
     │       └── equilibration.in           # energy minimization + NVT/NPT equilibration
-    │       
     │
     ├── 3_micromechanics_fea_ansys/
     │   ├── MICROMECHANICS_README.md       # stage-specific documentation
@@ -50,19 +49,19 @@ The pipeline has three modeling stages, run in order of increasing length scale,
     │
     └── 4_data_analysis/
         ├── density_calculation.py             # equilibrium density from LAMMPS logs
-        ├── crystalline_tensile_properties.py  # E and ν from crystalline tensile logs
+        ├── crystalline_tensile_properties.py  # E and nu from crystalline tensile logs
         ├── crystalline_shear_properties.py   # G from crystalline shear logs
-        └── amorphous_properties.py            # isotropic E and ν from amorphous tensile logs
+        └── amorphous_properties.py            # isotropic E and nu from amorphous tensile logs
 
-## Stage 1 — DFT (Quantum ESPRESSO)
+## Stage 1 - DFT (Quantum ESPRESSO)
 
 Structural relaxation and convergence testing on the crystalline PEK unit cell. The plane-wave cutoff, charge-density cutoff, k-point mesh, and Gaussian smearing width are all convergence-tested before the production variable-cell relaxation (`vc-relax`) is run.
 
-The relaxed geometry is evaluated against the literature crystal structure, not carried forward automatically — the classical MD model in Stage 2 is built independently from the literature lattice parameters and programmatically generated coordinates, using the tools listed below.
+The relaxed geometry is evaluated against the literature crystal structure, not carried forward automatically - the classical MD model in Stage 2 is built independently from the literature lattice parameters and programmatically generated coordinates, using the tools listed below.
 
-See `1_dft_quantum_espresso/DFT_README.md` for the full methodology
+See `1_dft_quantum_espresso/DFT_README.md` for the full methodology.
 
-## Stage 2 — Molecular Dynamics (LAMMPS)
+## Stage 2 - Molecular Dynamics (LAMMPS)
 
 The crystalline and amorphous phases are modeled as two independent systems:
 
@@ -72,15 +71,15 @@ The crystalline and amorphous phases are modeled as two independent systems:
 
 Multiple independent replicate models (different initial velocity seeds) are used for both phases to support statistical averaging.
 
-See `2_md_lammps/MD_README.md` for the full methodology
+See `2_md_lammps/MD_README.md` for the full methodology.
 
-## Stage 3 — Micromechanics (ANSYS Material Designer)
+## Stage 3 - Micromechanics (ANSYS Material Designer)
 
-Homogenizes the two MD-derived phase stiffness tensors up through the GCB → Lamella → Spherulite hierarchy.
+Homogenizes the two MD-derived phase stiffness tensors up through the GCB -> Lamella -> Spherulite hierarchy.
 
 See `3_micromechanics_fea_ansys/MICROMECHANICS_README.md` for the full methodology, the two supporting Python scripts, and their illustrative default values.
 
-## Stage 4 — Data Analysis
+## Stage 4 - Data Analysis
 
 Generic LAMMPS log parsers that extract equilibrium density (`density_calculation.py`), tensile modulus and Poisson's ratio (`crystalline_tensile_properties.py`, `amorphous_properties.py`), and shear modulus (`crystalline_shear_properties.py`) via linear regression over a specified elastic-strain window, and generate the corresponding stress-strain plots.
 
@@ -92,19 +91,19 @@ Each MD input script's output filename is what the corresponding data-analysis s
 
 - `crystalline_seed1_equilibrated.data`
 - `crystalline_seed1_triclinic.data`
-- `crystalline_seed1_tension_X.log` → `crystalline_tensile_properties.py`
-- `crystalline_seed1_shear_XY.log` → `crystalline_shear_properties.py`
+- `crystalline_seed1_tension_X.log` -> `crystalline_tensile_properties.py`
+- `crystalline_seed1_shear_XY.log` -> `crystalline_shear_properties.py`
 - `amorphous_seed1_equilibrated.data`
-- `amorphous_seed1_tension_X.log` → `amorphous_properties.py`
+- `amorphous_seed1_tension_X.log` -> `amorphous_properties.py`
 
 ## Tools and Dependencies
 
-- **Quantum ESPRESSO** — DFT relaxation and convergence testing
-- **Avogadro, VESTA, OVITO** — structure building and inspection
-- **LUNAR toolkit** — force field atom typing and LAMMPS data file generation
-- **LAMMPS** — all molecular dynamics simulation
-- **ANSYS Material Designer** — all micromechanics homogenization
-- **Python** (NumPy, pandas, Matplotlib) — geometry calculations and log-file analysis
+- **Quantum ESPRESSO** - DFT relaxation and convergence testing
+- **Avogadro, VESTA, OVITO** - structure building and inspection
+- **LUNAR toolkit** - force field atom typing and LAMMPS data file generation
+- **LAMMPS** - all molecular dynamics simulation
+- **ANSYS Material Designer** - all micromechanics homogenization
+- **Python** (NumPy, pandas, Matplotlib) - geometry calculations and log-file analysis
 
 ## Status and Limitations
 
@@ -115,16 +114,16 @@ Each MD input script's output filename is what the corresponding data-analysis s
 ## References
 
 1. Mallick, P.K. *Fiber-Reinforced Composites: Materials, Manufacturing, and Design.* CRC Press, 2007.
-2. Wang, Y. et al. *RSC Advances* 6 (2016): 3198–3209.
-3. Talbott, M.F., Springer, G.S., Berglund, L.A. *Journal of Composite Materials* 21 (1987): 1056–1081.
-4. Bandyopadhyay, A. et al. *Polymer* 52 (2011): 2445–2452.
-5. Pisani, W. A. et al. *Polymer* 163 (2019): 96–105.
-6. Kashmari, K. et al. *ACS Applied Engineering Materials* 1 (2023): 3167–3177.
-7. Kemppainen, J. et al. *Journal of Chemical Information and Modeling* 64 (2024): 5108–5126.
-8. Blundell, D.J. and Osborn, B.N. *Polymer* 24 (1983): 953–958.
-9. Nishino, T., Tada, K. and Nakamae, K. *Polymer* 33 (1992): 736–743.
-10. Heinz, H. et al. *Langmuir* 29 (2013): 1754–1765.
+2. Wang, Y. et al. *RSC Advances* 6 (2016): 3198-3209.
+3. Talbott, M.F., Springer, G.S., Berglund, L.A. *Journal of Composite Materials* 21 (1987): 1056-1081.
+4. Bandyopadhyay, A. et al. *Polymer* 52 (2011): 2445-2452.
+5. Pisani, W. A. et al. *Polymer* 163 (2019): 96-105.
+6. Kashmari, K. et al. *ACS Applied Engineering Materials* 1 (2023): 3167-3177.
+7. Kemppainen, J. et al. *Journal of Chemical Information and Modeling* 64 (2024): 5108-5126.
+8. Blundell, D.J. and Osborn, B.N. *Polymer* 24 (1983): 953-958.
+9. Nishino, T., Tada, K. and Nakamae, K. *Polymer* 33 (1992): 736-743.
+10. Heinz, H. et al. *Langmuir* 29 (2013): 1754-1765.
 11. Thompson, A.P. et al. *Computer Physics Communications* 271 (2022): 108171.
-12. Martyna, G.J., Tobias, D.J. and Klein, M.L. *Journal of Chemical Physics* 101 (1994): 4177–4189.
+12. Martyna, G.J., Tobias, D.J. and Klein, M.L. *Journal of Chemical Physics* 101 (1994): 4177-4189.
 13. Giannozzi, P. et al. *Journal of Physics: Condensed Matter* 21 (2009): 395502.
 14. ANSYS, Inc. *ANSYS Material Designer.* ANSYS, Inc., Canonsburg, PA, 2023.
