@@ -89,7 +89,7 @@ variable        etruez equal ln(1+v_eengz)
 
 #----- calculate_stresses -------
 
-compute         p all pressure 1_temp
+compute         p all pressure thermo_temp
 variable        sxx equal -0.101325*c_p[1] #in MPa
 variable        syy equal -0.101325*c_p[2] #in MPa
 variable        szz equal -0.101325*c_p[3] #in MPa
