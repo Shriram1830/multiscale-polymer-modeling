@@ -1,5 +1,5 @@
 """
-parse_and_plot_crystalline_mechanics.py
+crystalline_tensile_properties.py
 
 Parses LAMMPS log files from uniaxial tensile deformation simulations of 
 crystalline structures. Extracts axial stress/strain and lateral strains to 
