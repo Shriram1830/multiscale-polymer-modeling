@@ -52,6 +52,7 @@ ATOMIC_POSITIONS crystal
 C      0.006346  0.378270  0.495890
 C      0.321245  0.004791  0.102332
 C      0.433356  0.889102  0.015062
+O      0.154864  0.351901  0.151184
 ! ... (Additional atoms truncated for template) ...
 
 K_POINTS automatic
