@@ -64,7 +64,7 @@ for seed in range(1, N_SEEDS + 1):
     for direction in DIRECTIONS:
 
         # Standardized file naming convention
-        log_file = f"polymer_seed{seed}_shear_{direction}.log"
+        log_file = f"crystalline_seed{seed}_shear_{direction}.log"
 
         if not os.path.exists(log_file):
             print(f"[SKIP] {log_file} not found")
