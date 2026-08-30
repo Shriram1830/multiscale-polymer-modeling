@@ -40,9 +40,12 @@ representative of the bulk semi-crystalline microstructure.
 
 The GCB is the smallest structural unit: primary crystalline blocks
 bound together by a less-ordered "secondary structure," which is
-modeled as amorphous PEK. Following the GCB dimensions reported by
-Wang et al. (*RSC Advances* 6, 2016, 3198–3209), the GCB was built as
-a 120 nm cube with an internal crystalline volume fraction of 86.2%.
+modeled as amorphous PEK. Following the general GCB morphology
+reported by Wang et al. (*RSC Advances* 6, 2016, 3198–3209), the GCB
+is built as a cube of a chosen edge length with a chosen internal
+crystalline volume fraction (illustrative values used in this
+template: a 100 nm edge length and an 85% internal fraction — see
+`lamella_length_calculator.py` for where these are set).
 
 This was modeled in ANSYS Material Designer as a two-phase RVE
 combining the MD-derived crystalline PEK stiffness tensor
@@ -56,53 +59,43 @@ material for Level 2.
 
 A lamella is modeled as a plank: one GCB block placed end-to-end with
 a variable-length amorphous PEK block along the chain axis. Because
-the GCB length is fixed (120 nm), the *overall* crystallinity of a
-given plank is entirely controlled by how long the attached amorphous
-block is. Longer amorphous section → lower plank crystallinity.
+the GCB length is fixed, the *overall* crystallinity of a given plank
+is entirely controlled by how long the attached amorphous block is.
+Longer amorphous section → lower plank crystallinity.
 
 The relationship comes from two nested volume fractions. The
 crystallinity of a plank isn't the same as the volume fraction of GCB
-material in that plank, because the GCB itself is only 86.2%
+material in that plank, because the GCB itself is only partially
 crystalline internally:
 
-```
-V_crys  = V_GCB × 0.862
-V_GCB   = L_GCB / (L_GCB + L_amorphous)
-```
+V_crys = V_GCB × f_GCB
+V_GCB = L_GCB / (L_GCB + L_amorphous)
 
+
+where `f_GCB` is the GCB's internal crystalline volume fraction.
 Solving for the amorphous length given a target crystallinity:
 
-```
-L_amorphous = L_GCB × (1 / V_GCB − 1),   where V_GCB = V_crys / 0.862
-```
+L_amorphous = L_GCB × (1 / V_GCB − 1), where V_GCB = V_crys / f_GCB
 
-We built five lamella planks at 15%, 30%, 45%, 60%, and 75%
-crystallinity, each requiring a specific amorphous block length:
 
-| Target crystallinity | GCB volume fraction | Amorphous length |
-|---|---|---|
-| 15% | 0.174 | 569.6 nm |
-| 30% | 0.348 | 224.8 nm |
-| 45% | 0.522 | 109.9 nm |
-| 60% | 0.696 | 52.4 nm |
-| 75% | 0.870 | 17.9 nm |
+Each target crystallinity in the chosen set requires its own
+amorphous block length. `lamella_length_calculator.py` computes this
+for an arbitrary list of targets and prints the resulting table
+(GCB volume fraction and amorphous length per target).
 
-Each plank was built and solved as its own two-body RVE in ANSYS
+Each plank is built and solved as its own two-body RVE in ANSYS
 Material Designer with periodic boundary conditions, GCB material from
 Level 1 assigned to one block and amorphous PEK to the other, giving
-five separate effective lamella stiffness tensors. Note that ANSYS's
-embedded geometry kernel enforces a minimum modeling scale in the
-micrometer range, so in practice all geometry was built at a
-proportionally scaled-up size (nanometers → millimeters, a 10⁶×
+one effective lamella stiffness tensor per target crystallinity. Note
+that ANSYS's embedded geometry kernel enforces a minimum modeling
+scale in the micrometer range, so in practice all geometry is built at
+a proportionally scaled-up size (nanometers → millimeters, a 10⁶×
 scale factor) rather than at the true physical scale. Linear elastic
 homogenization is scale-invariant — the effective stiffness tensor
 depends only on volume fraction and shape ratio, not absolute
 dimensions — so this has no effect on the resulting properties. This
 is a common and defensible workaround for CAD-kernel precision limits
 in RVE-based micromechanics, not a physical approximation.
-
-`lamella_length_calculator.py` in this repository performs the
-crystallinity-to-length calculation above for an arbitrary target list.
 
 ### Level 3 — Spherulite
 
@@ -112,16 +105,17 @@ nucleus, and crystallinity is highest at the core (where lamellae pack
 densely) and decreases toward the outer edge (where they've spread
 apart and amorphous material dominates).
 
-We captured this with a 6×6×6 cubic RUC (216 subcells). Each subcell
-was assigned:
+We captured this with a cubic RUC subdivided into a grid of subcells
+(`spherulite_builder.py` uses a 6×6×6 grid as its default; the grid
+size is configurable). Each subcell is assigned:
 
-1. **A crystallinity level**, drawn from the five lamella materials
-   built in Level 2 (plus pure amorphous PEK for the outermost
-   subcells), based on the subcell's squared radial distance from the
-   cube center. Crystallinity is strictly non-increasing as radial
-   distance increases, and every subcell at the same radial distance
-   receives the identical crystallinity level, preserving full
-   spherical symmetry.
+1. **A crystallinity level**, drawn from the discrete set of lamella
+   materials built in Level 2 (plus pure amorphous PEK for the
+   outermost subcells), based on the subcell's squared radial distance
+   from the cube center. Crystallinity is strictly non-increasing as
+   radial distance increases, and every subcell at the same radial
+   distance receives the identical crystallinity level, preserving
+   full spherical symmetry.
 
 2. **A radial orientation vector**, pointing from the cube center to
    that subcell's center. This defines the local chain-axis direction
@@ -133,36 +127,25 @@ was assigned:
 
 Because ANSYS Material Designer works with a small, discrete set of
 pre-solved lamella materials rather than a continuously graded
-property field, matching a specific target crystallinity exactly isn't
-always possible — the achievable overall averages form a fixed,
+property field, matching a specific target overall crystallinity
+exactly isn't always possible — the achievable averages form a fixed,
 irregular set of numbers depending on how many subcells fall into each
 radial shell. We treated this as a constrained search problem: among
 every radially-symmetric, monotonically-decreasing assignment of the
-five crystallinity levels (plus 0%) to the grid's nine distinct radial
-shells, find the one whose volume-weighted average crystallinity comes
-closest to the typical experimentally observed bulk value of 30%
-(Hudson et al., *Macromolecules* 25, 1992, 1759–1765), while requiring
-that all five lamella materials actually appear at least once.
+available crystallinity levels to the grid's distinct radial shells,
+find the one whose volume-weighted average crystallinity comes closest
+to a chosen target bulk value (a typical experimentally observed bulk
+value, per Hudson et al., *Macromolecules* 25, 1992, 1759–1765, is
+around 30% and is used as the default target), while requiring that
+every crystallinity level actually appears at least once.
 
-The resulting spherulite averages **29.44% crystallinity**, distributed
-as follows:
-
-| Crystallinity | Subcell count |
-|---|---|
-| 75% | 8 |
-| 60% | 24 |
-| 45% | 56 |
-| 30% | 48 |
-| 15% | 24 |
-| 0% (amorphous) | 56 |
-| **Total** | **216** |
-
-`spherulite_builder.py` generates this assignment from scratch — it
-enumerates the radial shell structure of a 6×6×6 grid, searches for the
+`spherulite_builder.py` performs this search from scratch — it
+enumerates the radial shell structure of the grid, searches for the
 best crystallinity-to-shell mapping under the symmetry and monotonicity
-constraints described above, and exports a CSV with each subcell's
-coordinates, crystallinity, and radial orientation vector, ready to
-drive the corresponding ANSYS setup.
+constraints described above, prints the achieved overall crystallinity
+and the subcell count at each level, and exports a CSV with each
+subcell's coordinates, crystallinity, and radial orientation vector,
+ready to drive the corresponding ANSYS setup.
 
 ## Tools Used
 
@@ -174,19 +157,21 @@ drive the corresponding ANSYS setup.
 
 ## Repository Contents
 
-```
-lamella_length_calculator.py   # crystallinity -> amorphous plank length
-spherulite_builder.py          # 6x6x6 spherulite RUC generator
-PEK_Spherulite_6x6x6.csv       # generated 216-subcell output
-```
+lamella_length_calculator.py # crystallinity -> amorphous plank length
+spherulite_builder.py # NxNxN spherulite RUC generator
+Polymer_Spherulite_6x6x6.csv # generated subcell output (produced by running spherulite_builder.py)
+
 
 ## Limitations and Assumptions
 
-- The GCB internal crystalline volume fraction (86.2%) and root-network
-  simplification (single spherulite representing the bulk) are carried
-  over from the PEEK literature (Wang et al., Pisani et al.) rather
-  than measured independently for PEK, since PEK and PEEK share the
-  same PAEK-family GCB morphology.
+- The GCB internal crystalline volume fraction and root-network
+  simplification (single spherulite representing the bulk) follow the
+  general modeling approach used in the PEEK literature (Wang et al.,
+  Pisani et al.) rather than being measured independently for PEK,
+  since PEK and PEEK share the same PAEK-family GCB morphology. Actual
+  values used for a given run should be sourced from your own DFT/MD
+  results or experimental references, not the illustrative defaults
+  in this template.
 - The spherulite is modeled as a cube rather than a sphere, and the
   lamella as a rectangular plank rather than the rounded shapes seen
   in SEM imaging — both are standard simplifications in RUC-based
@@ -195,7 +180,7 @@ PEK_Spherulite_6x6x6.csv       # generated 216-subcell output
 - Interfacial effects between crystalline and amorphous regions are
   not explicitly modeled at the molecular level, consistent with
   Pisani et al.'s treatment of PEEK.
-- Geometry was built at a proportionally scaled-up size to work around
+- Geometry is built at a proportionally scaled-up size to work around
   ANSYS's CAD kernel minimum feature size; this does not affect the
   resulting homogenized properties (see Level 2 above).
 
