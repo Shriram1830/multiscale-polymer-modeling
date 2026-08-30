@@ -53,7 +53,7 @@ def build_lamella_table(target_crystallinities_pct: list[float]) -> list[Lamella
 
 
 if __name__ == "__main__":
-    targets_pct = [20, 30, 40, 50, 60]
+    targets_pct = [15, 30, 45, 60, 75]
     planks = build_lamella_table(targets_pct)
 
     print(f"{'Target %':<12}{'GCB Vf':<12}{'L_amorphous (nm)':<20}")
