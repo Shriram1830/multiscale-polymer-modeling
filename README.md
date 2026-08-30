@@ -40,7 +40,7 @@ The pipeline has three modeling stages, run in order of increasing length scale,
     │   │   └── shear.in                   # shear deformation, xy/xz/yz
     │   │
     │   └── md_amorphous/
-    │       ├── equilibration.in           # energy minimization + NVT/NPT equilibration
+    │       └── equilibration.in           # energy minimization + NVT/NPT equilibration
     │       
     │
     ├── 3_micromechanics_fea_ansys/
@@ -60,6 +60,8 @@ Structural relaxation and convergence testing on the crystalline PEK unit cell. 
 
 The relaxed geometry is evaluated against the literature crystal structure, not carried forward automatically — the classical MD model in Stage 2 is built independently from the literature lattice parameters and programmatically generated coordinates, using the tools listed below.
 
+See `_dft_quantum_espresso/DFT_README.md` for the full methodology
+
 ## Stage 2 — Molecular Dynamics (LAMMPS)
 
 The crystalline and amorphous phases are modeled as two independent systems:
@@ -69,6 +71,8 @@ The crystalline and amorphous phases are modeled as two independent systems:
 - **Amorphous:** built via in-situ reactive polymerization (LAMMPS `fix bond/react`) from randomly packed monomer templates, followed by densification, high-temperature annealing, and equilibration, then characterized by uniaxial tensile testing along all three axes and averaged into a single isotropic response.
 
 Multiple independent replicate models (different initial velocity seeds) are used for both phases to support statistical averaging.
+
+See `2_md_lammps/MD_README.md` for the full methodology
 
 ## Stage 3 — Micromechanics (ANSYS Material Designer)
 
