@@ -3,7 +3,7 @@ density_calculation.py
 
 Calculates the equilibrium density from LAMMPS log files by averaging the 
 last N steps (default: 1000) of the thermodynamic output.
-Usage: python density_calculation *.log
+Usage: python density_calculation.py *.log
 """
 
 import sys, math, glob, os
