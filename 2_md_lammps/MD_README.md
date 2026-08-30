@@ -13,8 +13,8 @@ As with the rest of this repository, the files here are a vanilla template. Forc
     └── shear.in           # shear deformation, xy/xz/yz
 
     md_amorphous/
-    ├── equilibration.in   # energy minimization + NVT/NPT equilibration
-    └── tensile.in         # uniaxial tensile deformation, x/y/z
+    └── equilibration.in   # energy minimization + NVT/NPT equilibration
+    
 
 ## Crystalline Phase Workflow
 
