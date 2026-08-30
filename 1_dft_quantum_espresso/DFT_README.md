@@ -1,6 +1,6 @@
 # DFT Modeling of the Crystalline PEK Unit Cell
 
-This is the first stage of the DFT -> MD -> micromechanics pipeline. It relaxes the crystalline PEK unit cell and evaluates the resulting geometry, using the plane-wave pseudopotential package Quantum ESPRESSO. The output is used to evaluate the geometry adopted for the classical MD model in `2_md_lammps/md_crystalline/`, not to generate it directly - see Limitations below.
+This is the first stage of the DFT → MD → micromechanics pipeline. It relaxes the crystalline PEK unit cell and evaluates the resulting geometry, using the plane-wave pseudopotential package Quantum ESPRESSO. The output is used to evaluate the geometry adopted for the classical MD model in `2_md_lammps/md_crystalline/`, not to generate it directly - see Limitations below.
 
 As with the rest of this repository, the files here are a vanilla template. Convergence ranges, cutoffs, and k-point grids reflect a reasonable testing procedure for a system of this size, but any specific numerical outcome (relaxed lattice parameters, convergence behavior, predicted density, etc.) belongs to a specific production run and is not reproduced here.
 
