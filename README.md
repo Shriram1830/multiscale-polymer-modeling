@@ -108,7 +108,6 @@ Each MD input script's output filename is what the corresponding data-analysis s
 ## Status and Limitations
 
 - All input files in this repository use placeholder values (lattice parameters, force-field constants, target crystallinities, etc.) and are meant to be adapted to a specific system, not run as-is.
-- The DFT and MD stages do not yet have their own per-folder READMEs; this document and the inline comments in each script are the current documentation for those stages.
 - See `3_micromechanics_fea_ansys/MICROMECHANICS_README.md` for stage-specific limitations and assumptions in the micromechanics homogenization.
 
 ## References
