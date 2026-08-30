@@ -41,7 +41,7 @@ The pipeline has three modeling stages, run in order of increasing length scale,
     │   │
     │   └── md_amorphous/
     │       ├── equilibration.in           # energy minimization + NVT/NPT equilibration
-    │       └── tensile.in                 # uniaxial tensile deformation, x/y/z
+    │       
     │
     ├── 3_micromechanics_fea_ansys/
     │   ├── MICROMECHANICS_README.md       # stage-specific documentation
