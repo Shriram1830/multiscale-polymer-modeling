@@ -16,13 +16,13 @@ variable    dir equal 1   # CHANGE THIS FOR EACH RUN
 variable    rep equal 1   # CHANGE THIS TO MATCH YOUR SEED
 
 if "${dir} == 1" then &
-  "variable myid string polymer_seed${rep}_shear_XY"
+  "variable myid string crystalline_seed${rep}_shear_XY"
 
 if "${dir} == 2" then &
-  "variable myid string polymer_seed${rep}_shear_XZ"
+  "variable myid string crystalline_seed${rep}_shear_XZ"
 
 if "${dir} == 3" then &
-  "variable myid string polymer_seed${rep}_shear_YZ"
+  "variable myid string crystalline_seed${rep}_shear_YZ"
 
 #-------- initialization --------
 units       real
@@ -41,7 +41,7 @@ pair_style      lj/class2/coul/long 10.0
 pair_modify     mix sixthpower
 
 # Automatically reads the correct triclinic file based on your seed number
-read_data       equilibrated_polymer_triclinic_${rep}.data # INPUT: Insert your parameterized LAMMPS triclinic data file here
+read_data       crystalline_seed${rep}_triclinic.data # INPUT: Insert your parameterized LAMMPS triclinic data file here
 kspace_style    pppm 1.0e-4             
 
 neigh_modify    every 1 delay 0 check yes one 5000 page 50000
