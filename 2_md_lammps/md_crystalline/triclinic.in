@@ -16,7 +16,7 @@ newton          on
 
 # ---> JUST CHANGE THIS NUMBER FOR EACH RUN (1, 2, 3, 4, 5) <---
 variable        rep equal 1
-variable        myid string r${rep}_trc
+variable        myid string crystalline_seed${rep}_triclinic
 
 #--------force-field------------
 bond_style      class2 
@@ -29,7 +29,7 @@ pair_style      lj/class2/coul/long 10.0
 pair_modify     mix sixthpower
 
 # Read the equilibrated orthogonal data file
-read_data       equilibrated_polymer_${rep}.data # INPUT: Insert your parameterized LAMMPS data file here
+read_data       crystalline_seed${rep}_equilibrated.data # INPUT: Insert your parameterized LAMMPS data file here
 
 #-----------settings------------
 
