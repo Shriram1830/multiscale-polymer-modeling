@@ -28,11 +28,13 @@ The pipeline has three modeling stages, run in order of increasing length scale,
 
     .
     ├── 1_dft_quantum_espresso/
+    │   ├── DFT_README.md
     │   ├── orthorhombic_cell_builder.py  # generates placeholder CIF for the crystalline unit cell
     │   ├── scf.in                        # SCF template for cutoff/k-point convergence testing
     │   └── degauss.in                    # SCF template for smearing (degauss) convergence testing
     │
     ├── 2_md_lammps/
+    │   ├── MD_README.md
     │   ├── md_crystalline/
     │   │   ├── equilibration.in           # energy minimization + NVT/NPT equilibration
     │   │   ├── tensile.in                 # uniaxial tensile deformation, x/y/z
